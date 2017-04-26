@@ -4,6 +4,7 @@ const source     = require('vinyl-source-stream');
 const babelify   = require('babelify');
 const sync       = require('browser-sync').create();
 const stylus     = require('gulp-stylus');
+const eslint     = require('gulp-eslint');
 
 
 gulp.task('browserify', function() {
@@ -17,7 +18,7 @@ gulp.task('browserify', function() {
     .pipe(gulp.dest('./dist'))
 });
 
-gulp.task('js-watch', ['browserify'], function (done) {
+gulp.task('js-watch', ['lint', 'browserify'], function (done) {
   sync.reload()
   done()
 })
@@ -39,10 +40,18 @@ gulp.task('serve', ['browserify'], function () {
 })
 
 gulp.task('styl', function () {
-  return gulp.src('src/styles/*.styl')
+  gulp.src('src/styles/*.styl')
     .pipe(stylus())
     .pipe(gulp.dest('./dist/styles'))
     .pipe(sync.stream());
+});
+
+gulp.task('lint', () => {
+  console.log("lint");
+  return gulp.src(['src/*.js'])
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
 });
 
 
